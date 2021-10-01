@@ -1,7 +1,7 @@
 /*
  * Lectura del sensor ultrasónico Hc-sr04 con el ESP32CAM y MQTT
- * por: Hugo Escalpelo
- * Fecha: 28 de julio de 2021
+ * por: Hugo Escalpelo, Anthony Cerqueda
+ * Fecha: 01 de septiembre de 2021
  * 
  * Este programa lee el sensor ultrasónico con la bilioteca Ultrasonic de Erick Simoes
  * en su version 3.0.0 Se mezcla con el programa ESP32CAM-MQTT-basic del repositorio de
@@ -22,6 +22,8 @@
 //Bibliotecas
 #include <WiFi.h>  // Biblioteca para el control de WiFi
 #include <PubSubClient.h> //Biblioteca para conexion MQTT
+#include <Ultrasonic.h>
+
 
 //Datos de WiFi
 const char* ssid = "********";  // Aquí debes poner el nombre de tu red
@@ -31,16 +33,21 @@ const char* password = "********";  // Aquí debes poner la contraseña de tu re
 const char* mqtt_server = "127.0.0.1"; // Si estas en una red local, coloca la IP asignada, en caso contrario, coloca la IP publica
 IPAddress server(127,0,0,1);
 
-// Objetos
-WiFiClient espClient; // Este objeto maneja los datos de conexion WiFi
-PubSubClient client(espClient); // Este objeto maneja los datos de conexion al broker
-
 // Variables
 int flashLedPin = 4;  // Para indicar el estatus de conexión
 int statusLedPin = 33; // Para ser controlado por MQTT
 long timeNow, timeLast; // Variables de control de tiempo no bloqueante
-int data = 0; // Contador
+int distancia = 0; // Contador
 int wait = 5000;  // Indica la espera cada 5 segundos para envío de mensajes MQTT
+int pinTrigger = 14; // Pin del trigger
+int pinEcho = 15; // Pin del echo
+
+
+// Objetos
+WiFiClient espClient; // Este objeto maneja los datos de conexion WiFi
+PubSubClient client(espClient); // Este objeto maneja los datos de conexion al broker
+Ultrasonic ultrasonic(pinTrigger,pinEcho); //Objeto que maneja el sensor
+
 
 // Inicialización del programa
 void setup() {
@@ -98,8 +105,10 @@ void loop() {
   timeNow = millis(); // Control de tiempo para esperas no bloqueantes
   if (timeNow - timeLast > wait) { // Manda un mensaje por MQTT cada cinco segundos
     timeLast = timeNow; // Actualización de seguimiento de tiempo
-
-    data++; // Incremento a la variable para ser enviado por MQTT
+    
+    /Lectrua del sensor ultrasónico
+    distancia ultrasonic.read(); // Lectura del sensor
+    
     char dataString[8]; // Define una arreglo de caracteres para enviarlos por MQTT, especifica la longitud del mensaje en 8 caracteres
     dtostrf(data, 1, 2, dataString);  // Esta es una función nativa de leguaje AVR que convierte un arreglo de caracteres en una variable String
     Serial.print("Contador: "); // Se imprime en monitor solo para poder visualizar que el evento sucede
