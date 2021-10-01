@@ -15,8 +15,8 @@
  * ledFlash-------GPIO 4----------On=>HIGH, Off=>LOW
  * HC-SR04-VCC----VCC-FTDI
  * HC-SR04-GND----GND-FTDI
- * HC-SR04-Trig---GPIO15
- * HC-SR04-Echo---GPIO14
+ * HC-SR04-Trig---GPIO14
+ * HC-SR04-Echo---GPIO15
  */
 
 //Bibliotecas
